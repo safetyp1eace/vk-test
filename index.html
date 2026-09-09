@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Расписание</title>
+    <title>Расписание 9В-262</title>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f1016; color: #fff; margin: 0; padding: 12px; }
-        .card { background: #1a1b26; border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; border: 1px solid #2f334d; }
+        .info-bar { background: #1a1b26; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 14px; display: flex; justify-content: space-between; border: 1px solid #2f334d; color: #38bdf8; font-weight: bold; }
+        .card { background: #1a1b26; border-radius: 14px; padding: 16px; margin-bottom: 12px; border: 1px solid #2f334d; }
         .card.active { border: 2px solid #22c55e; }
+        .card.empty { opacity: 0.4; }
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .lesson-num { color: #38bdf8; font-weight: bold; font-size: 15px; }
-        .cabinet { background: #2f334d; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: bold; }
         .subject { font-size: 18px; font-weight: bold; margin-bottom: 6px; }
         .teacher { color: #94a3b8; font-size: 14px; margin-bottom: 10px; }
         .footer { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; border-top: 1px solid #2f334d; padding-top: 8px; }
@@ -21,57 +22,137 @@
 </head>
 <body>
 
-    <div class="card">
-        <div class="header">
-            <span class="lesson-num">Пара 2</span>
-            <span class="cabinet">Каб. 204</span>
-        </div>
-        <div class="subject">Математика</div>
-        <div class="teacher">Дайбов В.А.</div>
-        <div class="footer">
-            <span class="time">10:10 – 11:40</span>
-            <span class="status" style="color: #64748b;">Завершена</span>
-        </div>
-    </div>
+    <div class="info-bar" id="infoBar">Загрузка...</div>
+    <div id="scheduleContainer"></div>
 
-    <div class="card">
-        <div class="header">
-            <span class="lesson-num">Пара 3</span>
-            <span class="cabinet">Каб. 115</span>
-        </div>
-        <div class="subject">Химия</div>
-        <div class="teacher">Могильная П.Г.</div>
-        <div class="footer">
-            <span class="time">12:00 – 13:30</span>
-            <span class="status" style="color: #64748b;">Завершена</span>
-        </div>
-    </div>
+<script>
+    // Полное расписание группы 9В-262 из твоего скриншота
+    const scheduleData = {
+        1: { // Неделя 1
+            1: [ // Понедельник
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "—", teacher: ""},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "История", teacher: "Волошко Р.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физика", teacher: "Кноп Т.И."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."},
+                {time: "15:40 - 17:10", num: "Пара 5", subject: "Основы безопасности и защиты", teacher: "Родина/Созинов Э.Б."}
+            ],
+            2: [ // Вторник
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Обществознание", teacher: "Богаченко А.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
+            ],
+            3: [ // Среда
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Химия", teacher: "Могильная П.Г."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
+            ],
+            4: [], // Четверг (выходной)
+            5: [ // Пятница
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "История", teacher: "Волошко Р.А."},
+                {time: "15:40 - 17:10", num: "Пара 5", subject: "Биология", teacher: "Козлова М.М."}
+            ],
+            6: [ // Суббота
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Русский язык", teacher: "Багирова З.П."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Литература", teacher: "Багирова З.П."}
+            ]
+        },
+        2: { // Неделя 2
+            1: [ // Понедельник
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "История", teacher: "Волошко Р.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Русский язык", teacher: "Багирова З.П."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физика", teacher: "Кноп Т.И."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
+            ],
+            2: [ // Вторник
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Обществознание", teacher: "Богаченко А.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
+            ],
+            3: [ // Среда
+                {time: "10:10 - 11:40", num: "Паra 2", subject: "Химия", teacher: "Могильная П.Г."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Литература", teacher: "Багирова З.П."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Биология", teacher: "Козлова М.М."}
+            ],
+            4: [], // Четверг (выходной)
+            5: [ // Пятница
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
+            ],
+            6: [ // Суббота
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "История", teacher: "Волошко Р.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Литература", teacher: "Багирова З.П."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
+            ]
+        }
+    };
 
-    <div class="card active">
-        <div class="header">
-            <span class="lesson-num">Пара 4</span>
-            <span class="cabinet">Каб. 310</span>
-        </div>
-        <div class="subject">Иностранный язык</div>
-        <div class="teacher">Налётова Н.Н.</div>
-        <div class="footer">
-            <span class="time">13:50 – 15:20</span>
-            <span class="status">До конца: 56:38</span>
-        </div>
-    </div>
+    function render() {
+        const now = new Date();
+        let day = now.getDay(); // 0 - ВС, 1 - ПН ... 6 - СБ
+        
+        // По умолчанию пусть текущая неделя 2 (как ты просил)
+        let currentWeek = 2; 
 
-    <div class="card">
-        <div class="header">
-            <span class="lesson-num">Пара 5</span>
-            <span class="cabinet">Каб. 212</span>
-        </div>
-        <div class="subject">Основы безопасности</div>
-        <div class="teacher">Родина / Селинов</div>
-        <div class="footer">
-            <span class="time">15:40 – 17:10</span>
-            <span class="status" style="color: #f59e0b;">До начала: 01:16:38</span>
-        </div>
-    </div>
+        const daysNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+        
+        document.getElementById("infoBar").innerHTML = `<span>${daysNames[day]}</span> <span>Неделя ${currentWeek}</span>`;
 
+        const container = document.getElementById("scheduleContainer");
+        container.innerHTML = "";
+
+        // Если воскресенье или нет пар
+        if (day === 0 || !scheduleData[currentWeek][day] || scheduleData[currentWeek][day].length === 0) {
+            container.innerHTML = '<div class="card"><div class="subject">Пар нет! Отдыхаем 🎉</div></div>';
+            return;
+        }
+
+        const lessons = scheduleData[currentWeek][day];
+        const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+
+        lessons.forEach(l => {
+            let [startStr, endStr] = l.time.split(" - ");
+            let [sH, sM] = startStr.split(":").map(Number);
+            let [eH, eM] = endStr.split(":").map(Number);
+            let startMin = sH * 60 + sM;
+            let endMin = eH * 60 + eM;
+
+            let statusText = "Ожидается";
+            let statusColor = "#94a3b8";
+            let isActive = false;
+
+            if (currentTimeMinutes >= startMin && currentTimeMinutes <= endMin) {
+                isActive = true;
+                statusText = "Идет сейчас 🔥";
+                statusColor = "#22c55e";
+            } else if (currentTimeMinutes > endMin) {
+                statusText = "Завершена";
+                statusColor = "#64748b";
+            }
+
+            container.innerHTML += `
+                <div class="card ${isActive ? 'active' : ''}">
+                    <div class="header">
+                        <span class="lesson-num">${l.num}</span>
+                    </div>
+                    <div class="subject">${l.subject}</div>
+                    <div class="teacher">${l.teacher}</div>
+                    <div class="footer">
+                        <span class="time">${l.time}</span>
+                        <span class="status" style="color: ${statusColor};">${statusText}</span>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    render();
+</script>
 </body>
 </html>
