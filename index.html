@@ -5,16 +5,73 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Расписание</title>
-    <script src="https://vk.com/js/api/openapi.js?169" type="text/javascript"></script>
     <style>
-        body { margin: 0; padding: 0; overflow: hidden; }
-        #vk_groups, #vk_groups iframe { width: 100vw !important; height: 100vh !important; border: none !important; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f1016; color: #fff; margin: 0; padding: 12px; }
+        .card { background: #1a1b26; border-radius: 14px; padding: 16px; margin-bottom: 12px; position: relative; border: 1px solid #2f334d; }
+        .card.active { border: 2px solid #22c55e; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .lesson-num { color: #38bdf8; font-weight: bold; font-size: 15px; }
+        .cabinet { background: #2f334d; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: bold; }
+        .subject { font-size: 18px; font-weight: bold; margin-bottom: 6px; }
+        .teacher { color: #94a3b8; font-size: 14px; margin-bottom: 10px; }
+        .footer { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; border-top: 1px solid #2f334d; padding-top: 8px; }
+        .time { color: #f8fafc; font-weight: 500; }
+        .status { color: #22c55e; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div id="vk_groups"></div>
-    <script type="text/javascript">
-        VK.Widgets.Group("vk_groups", {mode: 4, width: "auto", height: window.innerHeight}, 187395167);
-    </script>
+
+    <div class="card">
+        <div class="header">
+            <span class="lesson-num">Пара 2</span>
+            <span class="cabinet">Каб. 204</span>
+        </div>
+        <div class="subject">Математика</div>
+        <div class="teacher">Дайбов В.А.</div>
+        <div class="footer">
+            <span class="time">10:10 – 11:40</span>
+            <span class="status" style="color: #64748b;">Завершена</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="header">
+            <span class="lesson-num">Пара 3</span>
+            <span class="cabinet">Каб. 115</span>
+        </div>
+        <div class="subject">Химия</div>
+        <div class="teacher">Могильная П.Г.</div>
+        <div class="footer">
+            <span class="time">12:00 – 13:30</span>
+            <span class="status" style="color: #64748b;">Завершена</span>
+        </div>
+    </div>
+
+    <div class="card active">
+        <div class="header">
+            <span class="lesson-num">Пара 4</span>
+            <span class="cabinet">Каб. 310</span>
+        </div>
+        <div class="subject">Иностранный язык</div>
+        <div class="teacher">Налётова Н.Н.</div>
+        <div class="footer">
+            <span class="time">13:50 – 15:20</span>
+            <span class="status">До конца: 56:38</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="header">
+            <span class="lesson-num">Пара 5</span>
+            <span class="cabinet">Каб. 212</span>
+        </div>
+        <div class="subject">Основы безопасности</div>
+        <div class="teacher">Родина / Селинов</div>
+        <div class="footer">
+            <span class="time">15:40 – 17:10</span>
+            <span class="status" style="color: #f59e0b;">До начала: 01:16:38</span>
+        </div>
+    </div>
+
 </body>
 </html>
