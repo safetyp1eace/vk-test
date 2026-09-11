@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Расписание 9В-262</title>
+    <!-- Скрипт для работы виджета ВК -->
+    <script src="https://vk.com/js/api/openapi.js?169" type="text/javascript"></script>
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0f1016; color: #fff; margin: 0; padding: 12px; }
         .info-bar { background: #1a1b26; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; font-size: 14px; display: flex; justify-content: space-between; border: 1px solid #2f334d; color: #38bdf8; font-weight: bold; }
@@ -18,6 +20,8 @@
         .footer { display: flex; justify-content: space-between; font-size: 13px; color: #94a3b8; border-top: 1px solid #2f334d; padding-top: 8px; }
         .time { color: #f8fafc; font-weight: 500; }
         .status { color: #22c55e; font-weight: bold; }
+        .vk-container { margin-top: 20px; border-radius: 14px; overflow: hidden; background: #1a1b26; padding: 10px; border: 1px solid #2f334d; }
+        h3 { text-align: center; color: #94a3b8; font-size: 16px; margin-top: 5px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
@@ -25,7 +29,14 @@
     <div class="info-bar" id="infoBar">Загрузка...</div>
     <div id="scheduleContainer"></div>
 
+    <!-- Блок с виджетом ВК -->
+    <div class="vk-container">
+        <h3>Замены из ВК 👇</h3>
+        <div id="vk_groups"></div>
+    </div>
+
 <script>
+    // Твой словарь кабинетов
     const teacherCabinets = {
         "Дайбов В.А.": "204",
         "Могильная П.Г.": "115",
@@ -43,68 +54,69 @@
         "Козлова М.М.": "114"
     };
 
+    // Полное расписание
     const scheduleData = {
         1: {
             1: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "—", teacher: ""},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "История", teacher: "Волошко Р.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Физика", teacher: "Кноп Т.И."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."},
-                {time: "15:40 - 17:10", num: "Пара 5", cabinet: "", subject: "Основы безопасности и защиты", teacher: "Родина/Созинов Э.Б."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "—", teacher: ""},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "История", teacher: "Волошко Р.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физика", teacher: "Кноп Т.И."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."},
+                {time: "15:40 - 17:10", num: "Пара 5", subject: "Основы безопасности и защиты", teacher: "Родина/Созинов Э.Б."}
             ],
             2: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "Обществознание", teacher: "Богаченко А.А."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Обществознание", teacher: "Богаченко А.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
             ],
             3: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Химия", teacher: "Могильная П.Г."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Химия", teacher: "Могильная П.Г."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
             ],
             4: [],
             5: [
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "История", teacher: "Волошко Р.А."},
-                {time: "15:40 - 17:10", num: "Пара 5", cabinet: "", subject: "Биология", teacher: "Козлова М.М."}
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "История", teacher: "Волошко Р.А."},
+                {time: "15:40 - 17:10", num: "Пара 5", subject: "Биология", teacher: "Козлова М.М."}
             ],
             6: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "Русский язык", teacher: "Багирова З.П."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Литература", teacher: "Багирова З.П."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Русский язык", teacher: "Багирова З.П."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Литература", teacher: "Багирова З.П."}
             ]
         },
         2: {
             1: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "История", teacher: "Волошко Р.А."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Русский язык", teacher: "Багирова З.П."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Физика", teacher: "Кноп Т.И."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "История", teacher: "Волошко Р.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Русский язык", teacher: "Багирова З.П."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физика", teacher: "Кноп Т.И."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
             ],
             2: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "Обществознание", teacher: "Богаченко А.А."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Обществознание", teacher: "Богаченко А.А."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Физическая культура", teacher: "Моисеенко В.М. Никифоров О.Н."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Физика (вх)", teacher: "Кноп Т.И. Демидова М.А."}
             ],
             3: [
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Химия", teacher: "Могильная П.Г."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Литература", teacher: "Багирова З.П."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Биология", teacher: "Козлова М.М."}
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Химия", teacher: "Могильная П.Г."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Литература", teacher: "Багирова З.П."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Биология", teacher: "Козлова М.М."}
             ],
             4: [],
             5: [
-                {time: "08:30 - 10:00", num: "Пара 1", cabinet: "", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Математика", teacher: "Дайбов В.А."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
+                {time: "08:30 - 10:00", num: "Пара 1", subject: "Иностранный язык", teacher: "Налётова Н.И. Минаев П.В."},
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Математика", teacher: "Дайбов В.А."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Основы безопасности", teacher: "Родина/Созинов Э.Б."}
             ],
             6: [
-                {time: "10:10 - 11:40", num: "Пара 2", cabinet: "", subject: "История", teacher: "Волошко Р.А."},
-                {time: "12:00 - 13:30", num: "Пара 3", cabinet: "", subject: "Литература", teacher: "Багирова З.П."},
-                {time: "13:50 - 15:20", num: "Пара 4", cabinet: "", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
+                {time: "10:10 - 11:40", num: "Пара 2", subject: "История", teacher: "Волошко Р.А."},
+                {time: "12:00 - 13:30", num: "Пара 3", subject: "Литература", teacher: "Багирова З.П."},
+                {time: "13:50 - 15:20", num: "Пара 4", subject: "Информатика", teacher: "Дергачев А.И. Анненко Е.С."}
             ]
         }
     };
@@ -112,7 +124,7 @@
     function render() {
         const now = new Date();
         let day = now.getDay();
-        let currentWeek = 2;
+        let currentWeek = 2; // Жестко ставим неделю 2
 
         const daysNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
         document.getElementById("infoBar").innerHTML = `<span>${daysNames[day]}</span> <span>Неделя ${currentWeek}</span>`;
@@ -129,7 +141,8 @@
         const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
 
         lessons.forEach(l => {
-            let cab = l.cabinet || teacherCabinets[l.teacher] || "—";
+            // Берем кабинет из словаря по преподу
+            let cab = teacherCabinets[l.teacher] || "—";
 
             let [startStr, endStr] = l.time.split(" - ");
             let [sH, sM] = startStr.split(":").map(Number);
@@ -177,7 +190,10 @@
     }
 
     render();
-    setInterval(render, 60000);
+    setInterval(render, 60000); // Обновляем таймер раз в минуту
+
+    // Запускаем виджет ВК (группа 187395167)
+    VK.Widgets.Group("vk_groups", {mode: 4, width: "auto", height: "500", color1: '1a1b26', color2: 'ffffff', color3: '38bdf8'}, 187395167);
 </script>
 </body>
 </html>
