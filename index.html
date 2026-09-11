@@ -92,16 +92,10 @@
         }
     };
 
-    function formatTime(diffMinutes) {
-        let h = Math.floor(diffMinutes / 60);
-        let m = diffMinutes % 60;
-        return (h > 0 ? h + " ч. " : "") + m + " мин.";
-    }
-
     function render() {
         const now = new Date();
         let day = now.getDay();
-        let currentWeek = 2; // Текущая неделя 2
+        let currentWeek = 2; // Сейчас жестко стоит Неделя 2
 
         const daysNames = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
         document.getElementById("infoBar").innerHTML = `<span>${daysNames[day]}</span> <span>Неделя ${currentWeek}</span>`;
@@ -131,14 +125,24 @@
             if (currentTimeMinutes >= startMin && currentTimeMinutes <= endMin) {
                 isActive = true;
                 let left = endMin - currentTimeMinutes;
-                statusText = `До конца: ${left} мин.`;
+                
+                let h = Math.floor(left / 60);
+                let m = left % 60;
+                let timeLeftStr = (h > 0 ? h + " ч. " : "") + m + " мин.";
+                
+                statusText = `До конца: ${timeLeftStr}`;
                 statusColor = "#22c55e";
             } else if (currentTimeMinutes > endMin) {
                 statusText = "Завершена";
                 statusColor = "#64748b";
             } else {
                 let left = startMin - currentTimeMinutes;
-                statusText = `До начала: ${left} мин.`;
+                
+                let h = Math.floor(left / 60);
+                let m = left % 60;
+                let timeLeftStr = (h > 0 ? h + " ч. " : "") + m + " мин.";
+                
+                statusText = `До начала: ${timeLeftStr}`;
                 statusColor = "#f59e0b";
             }
 
@@ -160,6 +164,9 @@
     }
 
     render();
+    
+    // Обновлять таймеры каждую минуту, чтобы время тикало само
+    setInterval(render, 60000);
 </script>
 </body>
 </html>
